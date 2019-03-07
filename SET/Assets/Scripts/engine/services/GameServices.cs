@@ -12,5 +12,6 @@ namespace Assets.Scripts.engine.services
         void notifyOpenCardsAfterMatch(List<Card> cards);
         void notifyExtraCards(List<Card> cards);
         void notifyMatchCompleted(List<Card> cards);
+        void notifyEndSession();
     }
 }

@@ -11,38 +11,34 @@ public class GameView : MonoBehaviour, GameServices
     public Transform board;
     private List<CardView> cardList;
     private List<Card> cardMatch;
-    
+    private GameObject prefabCard;
+
     void Awake()
     {
         board = transform.Find("Board").gameObject.transform;
         cardList = new List<CardView>();
+        prefabCard = Resources.Load<GameObject>("Prefab/card/Card");
+
         session = new GameSession(this);
     }
 
-    public void notifyDefaultCards(List<Card> cards)
+    public void notifyDefaultCards(List<Card> cards) => DrawCard(cards);
+    public void notifyOpenCardsAfterMatch(List<Card> cards) => DrawCard(cards);
+    public void notifyExtraCards(List<Card> cards) => DrawCard(cards);
+
+    private void DrawCard(List<Card> cards)
     {
         string str = "";
-        GameObject prefab = Resources.Load<GameObject>("Prefab/card/Card");
-        for (int i = 0; i < cards.Count; i++)
+        
+        foreach (var t in cards)
         {
-            str += cards[i] + "\n";
-            CardView cv = Instantiate(prefab, board).AddComponent<CardView>().Initiate(cards[i]);
+            str += t + "\n";
+            CardView cv = Instantiate(prefabCard, board).AddComponent<CardView>().Initiate(t);
             cardList.Add(cv);
             cv.onClick.AddListener(() => OnClick(cv));
-
         }
 
-        Debug.Log("notifyDefaultCards : " +  '\n' +  str);
-    }
-
-    public void notifyOpenCardsAfterMatch(List<Card> cards)
-    {
-        throw new System.NotImplementedException();
-    }
-
-    public void notifyExtraCards(List<Card> cards)
-    {
-        throw new System.NotImplementedException();
+        //Debug.Log("notifyDefaultCards : " + '\n' + str);
     }
 
     public void notifyMatchCompleted(List<Card> cards)
@@ -68,6 +64,11 @@ public class GameView : MonoBehaviour, GameServices
         }
 
         cardMatch = new List<Card>();
+    }
+
+    public void notifyEndSession()
+    {
+        Debug.Log("END GAME");
     }
 
     private void OnClick(CardView cardView)

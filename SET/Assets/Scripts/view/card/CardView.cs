@@ -124,6 +124,7 @@ namespace Assets.Scripts.view.card
 
         public void OnClicked(bool isActive)
         {
+            if (!isActiveAndEnabled) return;
             selected.gameObject.SetActive(isActive);
         }
     } 

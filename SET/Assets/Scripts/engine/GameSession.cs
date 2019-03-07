@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Assets.Scripts.engine.services;
-using UnityEngine.Diagnostics;
 using Debug = UnityEngine.Debug;
 
 public class GameSession
@@ -14,7 +11,8 @@ public class GameSession
     public const  int TOTAL_CARDS_IN_DEFAULT_ROUND = 12;
     public const  int TOTAL_CARDS_IN_EXTRA_ROUND = 3;
     public const  int TOTAL_CARDS_TO_MATCH = 3;
-
+    public int userPoints { get; private set; }
+    public int timeSession{ get; private set; }
     private List<Card> openedList;
     public GameSession(GameServices services)
     {
@@ -22,7 +20,8 @@ public class GameSession
         behaviour = new SessionBehaviour();
         cardSession = behaviour.GenerateShuffleCard().ToList();
         OpenDefaultCards();
-        CheckAnyMatch();
+        userPoints = 0;
+        timeSession = 60;
     }
 
     private void OpenDefaultCards()
@@ -50,13 +49,15 @@ public class GameSession
         int countCards = total <= cardSession.Count ? total : cardSession.Count;
         if (countCards == 0) return null;
 
+        List < Card > currentOpen = new List<Card>();
         for (int i = 0; i < total; i++)
         {
             openedList.Add(cardSession[i]);
+            currentOpen.Add(cardSession[i]);
             cardSession.Remove(cardSession[i]);
         }
 
-        return openedList;
+        return currentOpen;
     }
 
     public void CheckMatch(List<Card> matchList)
@@ -72,6 +73,7 @@ public class GameSession
             }
             services.notifyMatchCompleted(matchList);
             OpenCardsAfterMatch(matchList.Count);
+            userPoints++;
         }
         else services.notifyMatchCompleted(null);
     }
@@ -79,8 +81,6 @@ public class GameSession
     public void CheckAnyMatch()
     {
         bool anyMatch = false;
-
-        List<Card> cardChecked = new List<Card>();
         for (int i = 0; i < openedList.Count; i++)
         {
             Card cardOne = openedList[i];
@@ -98,7 +98,6 @@ public class GameSession
                     anyMatch = true;
                 }
             }
-                
         }
 
         Debug.LogWarning("ANY MATCH: " + anyMatch);
@@ -109,5 +108,12 @@ public class GameSession
     {
         if(index >= openedList.Count) return 0;
         return index;
+    }
+
+    public int UserTime()
+    {
+        if(timeSession>0)timeSession--;
+        else services.notifyEndSession();
+        return timeSession;
     }
 }

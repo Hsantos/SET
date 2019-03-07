@@ -146,7 +146,7 @@ public class SessionBehaviour
 
         check =  (equalShapes == GameSession.TOTAL_CARDS_TO_MATCH || equalShapes== 1) &&
                  (equalAmount == GameSession.TOTAL_CARDS_TO_MATCH || equalAmount == 1) &&
-                 (equalColor == GameSession.TOTAL_CARDS_TO_MATCH || equalColor== 1) &&
+                 (equalColor == GameSession.TOTAL_CARDS_TO_MATCH || equalColor == 1) &&
                  (equalShading == GameSession.TOTAL_CARDS_TO_MATCH || equalShading == 1);
 
         //Debug.LogWarning(check +  " | "+ equalShapes + " | " + equalAmount + " | " + equalColor + " | " + equalShading);

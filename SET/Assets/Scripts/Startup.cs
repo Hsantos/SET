@@ -4,10 +4,11 @@ using UnityEngine;
 
 public class Startup : MonoBehaviour
 {
-    private GameView gameview;
-
+    //private GameView gameview;
+    private ClientNetwork clientNetwork;
     void Awake()
     {
-        GameObject.Find("Canvas").gameObject.AddComponent<GameView>();
+        //GameObject.Find("Canvas").gameObject.AddComponent<GameView>();
+        clientNetwork = new ClientNetwork();
     }
 }

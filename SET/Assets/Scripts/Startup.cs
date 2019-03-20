@@ -1,14 +1,43 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Assets.Scripts.engine.utils;
 using UnityEngine;
 
 public class Startup : MonoBehaviour
 {
-    //private GameView gameview;
+    private MenuView menuView;
+    private GameView gameview;
     private ClientNetwork clientNetwork;
+    private Canvas mainCanvas;
     void Awake()
     {
-        //GameObject.Find("Canvas").gameObject.AddComponent<GameView>();
-        clientNetwork = new ClientNetwork();
+        MainThread.initiate();
+        MainThread.setMainThread();
+
+        mainCanvas = GameObject.Find("Canvas").GetComponent<Canvas>();
+        menuView = mainCanvas.transform.Find("Menu").gameObject.AddComponent<MenuView>();
+        clientNetwork = GameObject.Find("ClientNetwork").gameObject.AddComponent<ClientNetwork>();
+        menuView.Initiate(clientNetwork);
+        menuView.OnSinglePlayerChoose = EnterSinglePlayerGame;
+        menuView.OnConnectMultiplayer = EnterMultiPlayerGame;
+       
+    }
+
+    private void EnterSinglePlayerGame()
+    {
+        Debug.Log("EnterSinglePlayerGame");
+        gameview = mainCanvas.gameObject.AddComponent<GameView>();
+        gameview.Initiate();
+        menuView.gameObject.SetActive(false);
+    }
+
+    private void EnterMultiPlayerGame()
+    {
+        Debug.Log("EnterMultiPlayerGame");
+        menuView.gameObject.SetActive(false);
+        gameview = mainCanvas.gameObject.AddComponent<GameView>();
+        clientNetwork.ReceiveServices(gameview);
+        gameview.Initiate(true, clientNetwork);
+       
     }
 }

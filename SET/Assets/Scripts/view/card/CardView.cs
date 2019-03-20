@@ -30,6 +30,8 @@ namespace Assets.Scripts.view.card
             string spriteName = "";
             Sprite spriteImage = null;
 
+            Debug.LogWarning("Card: " +  card.shape +  " | " +  card.shading +  " | " + card.amount +   "  | " + card.color);
+
             switch (card.shape)
             {
                 case CardFactory.SHAPE.OVAL:
@@ -65,6 +67,7 @@ namespace Assets.Scripts.view.card
 
             spriteImage = Resources.Load<Sprite>("Sprites/" + spriteName);
             Image current = null;
+
             switch (card.amount)
             {
                 case CardFactory.AMOUNT.ONE:

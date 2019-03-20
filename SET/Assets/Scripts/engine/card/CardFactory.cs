@@ -1,8 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using System;
 
-public class CardFactory : MonoBehaviour
+[Serializable]
+public class CardFactory
 {
     public enum COLOR
     {
@@ -13,9 +12,9 @@ public class CardFactory : MonoBehaviour
 
     public enum AMOUNT
     {
-        ONE=1,
-        TWO=2,
-        THREE=3
+        ONE,
+        TWO,
+        THREE
     }
 
     public enum SHADING

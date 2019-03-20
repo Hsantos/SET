@@ -16,6 +16,9 @@ public class GameView : MonoBehaviour, GameServices
     private Text labelSets;
     private Text labelTime;
     private GridLayoutGroup gridLayout;
+
+    private bool isMultiPlayer = false;
+    private NetworkServices network;
     void Awake()
     {
         board = transform.Find("Board").gameObject.transform;
@@ -24,12 +27,22 @@ public class GameView : MonoBehaviour, GameServices
         labelTime = transform.Find("LabelTime").gameObject.GetComponent<Text>();
         cardList = new List<CardView>();
         prefabCard = Resources.Load<GameObject>("Prefab/card/Card");
-        
+    }
 
-        session = new GameSession(this);
-        UpdateUserSets();
-        UpdateUserTime();
-        InvokeRepeating(nameof(UpdateUserTime),1,1);
+    public void Initiate(bool isMultiPlayer = false, NetworkServices network = null)
+    {
+        if (isMultiPlayer)
+        {
+            this.network = network;
+            network.DefaultCardsRequest();
+        }
+        else
+        {
+            session = new GameSession(this);
+            UpdateUserSets();
+            UpdateUserTime();
+            InvokeRepeating(nameof(UpdateUserTime), 1, 1);
+        }
     }
 
     public void notifyDefaultCards(List<Card> cards)
@@ -53,7 +66,7 @@ public class GameView : MonoBehaviour, GameServices
     private void DrawCard(List<Card> cards)
     {
         string str = "";
-        
+
         foreach (var t in cards)
         {
             str += t + "\n";
@@ -63,10 +76,13 @@ public class GameView : MonoBehaviour, GameServices
             cv.enabled = true;
         }
 
+        if (!isMultiPlayer)
+        {
+            Invoke(nameof(CheckAfterDraw),2f);
+            CheckBoardSize();
+        }
         //Debug.Log("notifyDefaultCards : " + '\n' + str);
-        Invoke(nameof(CheckAfterDraw),2f);
 
-        CheckBoardSize();
     }
 
     public void notifyMatchCompleted(List<Card> cards)

@@ -6,6 +6,7 @@ using System.Threading;
 using Assets.Scripts.engine.network;
 using Assets.Scripts.engine.services;
 using Assets.Scripts.engine.utils;
+using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Networking;
@@ -130,7 +131,8 @@ public class ClientNetwork:MonoBehaviour, NetworkServices
 
     private void TryParser(string returnData)
     {
-        ClientDataRequested data  = JsonUtility.FromJson<ClientDataRequested>(returnData);
+//        ClientDataRequested data  = JsonUtility.FromJson<ClientDataRequested>(returnData);
+        ClientDataRequested data = JsonConvert.DeserializeObject<ClientDataRequested>(returnData);
         MainThread.invoke(() => gameServices.notifyDefaultCards(data.cards));
     }
 

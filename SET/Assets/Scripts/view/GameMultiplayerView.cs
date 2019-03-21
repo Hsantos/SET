@@ -6,7 +6,7 @@ using Assets.Scripts.view.card;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class GameView : MonoBehaviour, GameServices
+public class GameMultiplayerView : GameView, GameServices
 {
     private GameSession session;
     public Transform board;
@@ -17,6 +17,8 @@ public class GameView : MonoBehaviour, GameServices
     private Text labelTime;
     private GridLayoutGroup gridLayout;
 
+    private bool isMultiPlayer = false;
+    private NetworkServices network;
     void Awake()
     {
         board = transform.Find("Board").gameObject.transform;
@@ -27,12 +29,10 @@ public class GameView : MonoBehaviour, GameServices
         prefabCard = Resources.Load<GameObject>("Prefab/card/Card");
     }
 
-    public void InitiateView()
+    public void InitiateMultiplayerView(NetworkServices network)
     {
-        session = new GameSession(this);
-        UpdateUserSets();
-        UpdateUserTime();
-        InvokeRepeating(nameof(UpdateUserTime), 1, 1);
+        this.network = network;
+        network.DefaultCardsRequest();
     }
 
     public void notifyDefaultCards(List<Card> cards)
@@ -57,7 +57,7 @@ public class GameView : MonoBehaviour, GameServices
     {
         string str = "";
 
-        foreach (var t in cards)
+        foreach (Card t in cards)
         {
             str += t + "\n";
             CardView cv = Instantiate(prefabCard, board).AddComponent<CardView>().Initiate(t);
@@ -65,9 +65,6 @@ public class GameView : MonoBehaviour, GameServices
             cv.onClick.AddListener(() => OnClick(cv));
             cv.enabled = true;
         }
-
-        Invoke(nameof(CheckAfterDraw),2f);
-        CheckBoardSize();
     }
 
     public void notifyMatchCompleted(List<Card> cards)
@@ -78,11 +75,9 @@ public class GameView : MonoBehaviour, GameServices
             {
                 foreach (var t in cardList)
                 {
-                    if (cd == t.card)
-                    {
-                        cardList.Remove(t);
-                        Destroy(t.gameObject);
-                    }
+                    if (cd != t.card) continue;
+                    cardList.Remove(t);
+                    Destroy(t.gameObject);
                 }
             }
         }

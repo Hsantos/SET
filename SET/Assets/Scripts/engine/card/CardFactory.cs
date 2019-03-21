@@ -3,6 +3,7 @@
 [Serializable]
 public class CardFactory
 {
+
     public enum COLOR
     {
         GREEN,

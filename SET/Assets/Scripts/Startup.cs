@@ -27,7 +27,7 @@ public class Startup : MonoBehaviour
     {
         Debug.Log("EnterSinglePlayerGame");
         gameview = mainCanvas.gameObject.AddComponent<GameView>();
-        gameview.Initiate();
+        gameview.InitiateView();
         menuView.gameObject.SetActive(false);
     }
 
@@ -35,9 +35,9 @@ public class Startup : MonoBehaviour
     {
         Debug.Log("EnterMultiPlayerGame");
         menuView.gameObject.SetActive(false);
-        gameview = mainCanvas.gameObject.AddComponent<GameView>();
+        gameview = mainCanvas.gameObject.AddComponent<GameMultiplayerView>();
         clientNetwork.ReceiveServices(gameview);
-        gameview.Initiate(true, clientNetwork);
+        ((GameMultiplayerView)gameview).InitiateMultiplayerView(clientNetwork);
        
     }
 }

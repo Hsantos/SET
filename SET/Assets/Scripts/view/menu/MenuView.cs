@@ -16,8 +16,9 @@ public class MenuView : MonoBehaviour
     private Button btConnect;
     private InputField inputIp;
     private InputField inputPort;
+    private InputField inputName;
     private Text labelStatus;
-
+    
     public UnityAction OnConnectMultiplayer;
     public UnityAction OnSinglePlayerChoose;
 
@@ -44,6 +45,7 @@ public class MenuView : MonoBehaviour
         multiPlayerPanel = transform.Find("MultiplayerPanel").transform;
         inputIp = multiPlayerPanel.Find("InputIp").GetComponent<InputField>();
         inputPort = multiPlayerPanel.Find("InputPort").GetComponent<InputField>();
+        inputName = multiPlayerPanel.Find("InputName").GetComponent<InputField>();
         btConnect = multiPlayerPanel.Find("BtConnect").GetComponent<Button>();
         labelStatus = multiPlayerPanel.Find("LabelStatus").GetComponent<Text>();
 
@@ -67,8 +69,10 @@ public class MenuView : MonoBehaviour
                 inputIp.text = "192.168.100.0";
                 inputPort.text = "0000";
                 labelStatus.text = "";
+                inputName.name = "name";
 
                 break;
+
             case MENU_STATE.MULTIPLAYER:
                 mainPanel.gameObject.SetActive(false);
                 multiPlayerPanel.gameObject.SetActive(true);
@@ -85,7 +89,7 @@ public class MenuView : MonoBehaviour
         btConnect.gameObject.SetActive(false);
         labelStatus.text = "Wait Connecting...";
         clientNetwork.OnClientConnected = OnConnectionCallback;
-        clientNetwork.Connect(inputIp.text, inputPort.text);
+        clientNetwork.Connect(inputIp.text, inputPort.text, inputName.text);
         connectProcess = true;
         
     }

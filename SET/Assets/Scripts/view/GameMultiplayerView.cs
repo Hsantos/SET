@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Assets.Scripts.engine.services;
 using Assets.Scripts.view.card;
 using UnityEngine;
@@ -69,6 +67,8 @@ public class GameMultiplayerView : GameView, GameServices
 
     public void notifyMatchCompleted(List<Card> cards)
     {
+        Debug.LogWarning("notifyMatchCompleted :  " +  cards.Count +  " | " + cardList.Count);
+
         if (cards != null)
         {
             foreach (var cd in cards)
@@ -91,7 +91,6 @@ public class GameMultiplayerView : GameView, GameServices
         }
 
         cardMatch = new List<Card>();
-        UpdateUserSets();
     }
 
     public void notifyEndSession()
@@ -119,7 +118,27 @@ public class GameMultiplayerView : GameView, GameServices
 
         if (cardMatch.Count == GameSession.TOTAL_CARDS_TO_MATCH)
         {
-            session.CheckMatch(cardMatch);
+            network.MatchRequest(cardMatch);
+//            if (session.IsMatch(cardMatch)) network.MatchRequest(cardMatch);
+//            else
+//            {
+//                ResetCardSelected(cardMatch);
+//                cardMatch.Clear();
+//            }
+        }
+    }
+
+    private void ResetCardSelected(List<Card> cardsSelected)
+    {
+        foreach (var c in cardsSelected)
+        {
+            foreach (var t in cardList)
+            {
+                if (t?.card == c)
+                {
+                    t.OnClicked(false);
+                }
+            }
         }
     }
 

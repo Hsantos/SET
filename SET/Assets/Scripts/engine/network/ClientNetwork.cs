@@ -4,6 +4,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using Assets.Scripts.engine.network;
+using Assets.Scripts.engine.network.request;
 using Assets.Scripts.engine.services;
 using Assets.Scripts.engine.utils;
 using Newtonsoft.Json;
@@ -23,6 +24,7 @@ public class ClientNetwork:MonoBehaviour, NetworkServices
 
     private string serverIp;
     private string serverPort;
+    private string userName;
 
     public UnityAction OnClientConnected;
 
@@ -49,10 +51,11 @@ public class ClientNetwork:MonoBehaviour, NetworkServices
         this.gameServices = services;
     }
 
-    public void Connect(string ip, string port)
+    public void Connect(string ip, string port, string userName)
     {
         serverIp = ip;
         serverPort = port;
+        this.userName = userName;
 
         Debug.Log("Client Started");
 
@@ -79,7 +82,7 @@ public class ClientNetwork:MonoBehaviour, NetworkServices
             serverStream = clientSocket.GetStream();
             connectDone.Set();
 
-            SendMessageToServer(RequestType.CONNECTION);
+            SendMessageToServer(new ClientRequest(RequestAction.START_SESSION, userName));
             sendDone.WaitOne();
             //
             ReceiveMessageToServer();
@@ -94,9 +97,9 @@ public class ClientNetwork:MonoBehaviour, NetworkServices
         }
     }
 
-    private void SendMessageToServer(string msg)
+    private void SendMessageToServer(ClientRequest request)
     {
-        string message = msg;// + "<EOF>";
+        string message = JsonConvert.SerializeObject(request);// + "<EOF>";
 
         Debug.Log("SendMessageToServer : " + message);
 
@@ -116,29 +119,52 @@ public class ClientNetwork:MonoBehaviour, NetworkServices
 
         Debug.Log("ReceiveMessageToServer: " + formatterData);
 
-        if (formatterData.Contains("{"))
-        {
-            TryParser(formatterData);
-           
-        }
-        else
-        {
-            Debug.Log("do nothing ");
-        }
-       
+        ServerReply reply = JsonConvert.DeserializeObject<ServerReply>(formatterData);
+        ExecuteServerReply(reply);
+
         receiveDone.Set();
     }
 
-    private void TryParser(string returnData)
+    private void ExecuteServerReply(ServerReply reply)
     {
-//        ClientDataRequested data  = JsonUtility.FromJson<ClientDataRequested>(returnData);
-        ClientDataRequested data = JsonConvert.DeserializeObject<ClientDataRequested>(returnData);
-        MainThread.invoke(() => gameServices.notifyDefaultCards(data.cards));
+        switch (reply.action)
+        {
+            case RequestAction.START_SESSION:
+                break;
+            case RequestAction.DEFAULT_CARDS:
+                List<Card> defaultCards = JsonConvert.DeserializeObject<List<Card>>(reply.data);
+                MainThread.invoke(() => gameServices.notifyDefaultCards(defaultCards));
+                break;
+            case RequestAction.CARDS_AFTER_MATCH:
+                List<Card> cardsAfterMatch = JsonConvert.DeserializeObject<List<Card>>(reply.data);
+                //MainThread.invoke(() => gameServices.notifyOpenCardsAfterMatch(cardsAfterMatch));
+                break;
+            case RequestAction.EXTRA_CARDS:
+                break;
+            case RequestAction.MATCH:
+                List<Card> cardsMatch = JsonConvert.DeserializeObject<List<Card>>(reply.data);
+                MainThread.invoke(() => gameServices.notifyMatchCompleted(cardsMatch));
+                break;
+            case RequestAction.END_SESSION:
+                break;
+            default:
+                throw new Exception("UNKNOWN MESSAGE: " +  reply.action);
+        }
     }
 
     public void DefaultCardsRequest()
     {
-        SendMessageToServer(RequestType.DEFAULT_CARDS);
+        SendMessageToServer(new ClientRequest(RequestAction.DEFAULT_CARDS,""));
+        sendDone.WaitOne();
+
+        ReceiveMessageToServer();
+        receiveDone.WaitOne();
+    }
+
+    public void MatchRequest(List<Card> cards)
+    {
+        ClientRequest request = new ClientRequest(RequestAction.MATCH, JsonConvert.SerializeObject(cards));
+        SendMessageToServer(request);
         sendDone.WaitOne();
 
         ReceiveMessageToServer();

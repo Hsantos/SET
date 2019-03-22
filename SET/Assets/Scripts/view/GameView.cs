@@ -78,7 +78,7 @@ public class GameView : MonoBehaviour, GameServices
             {
                 foreach (var t in cardList)
                 {
-                    if (cd == t.card)
+                    if (cd.Equals(t.card))
                     {
                         cardList.Remove(t);
                         Destroy(t.gameObject);

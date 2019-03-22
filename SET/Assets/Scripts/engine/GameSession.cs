@@ -60,12 +60,17 @@ public class GameSession
         return currentOpen;
     }
 
+    public bool IsMatch(List<Card> matchList)
+    {
+        return behaviour.IsMatch(matchList);
+    }
+
     public void CheckMatch(List<Card> matchList)
     {
 //        behaviour.IsMatch(matchList);
 //        services.notifyMatchCompleted(null);
 
-        if (behaviour.IsMatch(matchList))
+        if (IsMatch(matchList))
         {
             for (int i = 0; i < matchList.Count; i++)
             {

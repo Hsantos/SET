@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace Assets.Scripts.engine.services
 {
     public interface NetworkServices
     {
         void DefaultCardsRequest();
+        void MatchRequest(List<Card> cards);
     }
 }

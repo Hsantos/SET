@@ -66,8 +66,8 @@ public class MenuView : MonoBehaviour
                 mainPanel.gameObject.SetActive(true);
                 multiPlayerPanel.gameObject.SetActive(false);
 
-                inputIp.text = "192.168.100.0";
-                inputPort.text = "0000";
+                inputIp.text = "192.168.100.14";
+                inputPort.text = "1755";
                 labelStatus.text = "";
                 inputName.name = "name";
 

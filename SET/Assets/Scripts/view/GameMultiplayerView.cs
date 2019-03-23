@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Assets.Scripts.engine.game;
 using Assets.Scripts.engine.services;
 using Assets.Scripts.view.card;
 using UnityEngine;
@@ -75,7 +76,7 @@ public class GameMultiplayerView : GameView, GameServices
             {
                 foreach (var t in cardList)
                 {
-                    if (cd != t.card) continue;
+                    if (!cd.Equals(t.card)) continue;
                     cardList.Remove(t);
                     Destroy(t.gameObject);
                 }
@@ -93,10 +94,22 @@ public class GameMultiplayerView : GameView, GameServices
         cardMatch = new List<Card>();
     }
 
-    public void notifyEndSession()
+    public void notifyEndSession(ClientRanking ranking)
     {
         Debug.Log("END GAME");
-        labelTime.text = "END!";
+
+        if(ranking==null) labelTime.text = "END!";
+        else
+        {
+            string result = "END!";
+            for (int i = 0; i < ranking.list.Count; i++)
+            {
+                result += '\n' + ranking.list[i].name + " : " + ranking.list[i].points;
+            }
+
+            labelTime.text = result;
+        }
+
 
         CancelInvoke(nameof(CheckAfterDraw));
         CancelInvoke(nameof(UpdateUserTime));

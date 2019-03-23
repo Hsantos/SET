@@ -34,14 +34,14 @@ public class GameSession
     {
         List<Card> cardsToOpen = OpenCards(totalToOpen);
         if(cardsToOpen!=null)services.notifyOpenCardsAfterMatch(cardsToOpen);
-        else services.notifyEndSession();
+        else services.notifyEndSession(null);
     }
 
     public void OpenExtraCards()
     {
         List<Card> cardsToOpen = OpenCards(TOTAL_CARDS_IN_EXTRA_ROUND);
         if (cardsToOpen != null) services.notifyExtraCards(cardsToOpen);
-        else services.notifyEndSession();
+        else services.notifyEndSession(null);
     }
 
     private List<Card> OpenCards(int total)
@@ -118,7 +118,7 @@ public class GameSession
     public int UserTime()
     {
         if(timeSession>0)timeSession--;
-        else services.notifyEndSession();
+        else services.notifyEndSession(null);
         return timeSession;
     }
 }

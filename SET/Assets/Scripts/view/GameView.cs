@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using Assets.Scripts.engine.game;
 using Assets.Scripts.engine.services;
 using Assets.Scripts.view.card;
 using UnityEngine;
@@ -99,7 +100,7 @@ public class GameView : MonoBehaviour, GameServices
         UpdateUserSets();
     }
 
-    public void notifyEndSession()
+    public void notifyEndSession(ClientRanking ranking)
     {
         Debug.Log("END GAME");
         labelTime.text = "END!";

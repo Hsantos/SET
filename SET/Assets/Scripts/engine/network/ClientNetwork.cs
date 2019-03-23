@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using Assets.Scripts.engine.game;
 using Assets.Scripts.engine.network;
 using Assets.Scripts.engine.network.request;
 using Assets.Scripts.engine.services;
@@ -21,7 +22,6 @@ public class ClientNetwork:MonoBehaviour, NetworkServices
     private static ManualResetEvent receiveDone;
     private Socket socket;
     private static String response = String.Empty;
-
     private string serverIp;
     private string serverPort;
     private string userName;
@@ -61,7 +61,7 @@ public class ClientNetwork:MonoBehaviour, NetworkServices
 
         try
         {
-            clientSocket.BeginConnect("192.168.100.14", 1755, new AsyncCallback(ConnectCallback), clientSocket);
+            clientSocket.BeginConnect(serverIp, Int32.Parse(serverPort), ConnectCallback, clientSocket);
             connectDone.WaitOne();
             
         }
@@ -137,15 +137,19 @@ public class ClientNetwork:MonoBehaviour, NetworkServices
                 break;
             case RequestAction.CARDS_AFTER_MATCH:
                 List<Card> cardsAfterMatch = JsonConvert.DeserializeObject<List<Card>>(reply.data);
-                //MainThread.invoke(() => gameServices.notifyOpenCardsAfterMatch(cardsAfterMatch));
+                MainThread.invoke(() => gameServices.notifyOpenCardsAfterMatch(cardsAfterMatch));
                 break;
             case RequestAction.EXTRA_CARDS:
+                List<Card> extraCardMatch = JsonConvert.DeserializeObject<List<Card>>(reply.data);
+                MainThread.invoke(() => gameServices.notifyExtraCards(extraCardMatch));
                 break;
             case RequestAction.MATCH:
                 List<Card> cardsMatch = JsonConvert.DeserializeObject<List<Card>>(reply.data);
                 MainThread.invoke(() => gameServices.notifyMatchCompleted(cardsMatch));
                 break;
             case RequestAction.END_SESSION:
+                ClientRanking ranking = JsonConvert.DeserializeObject<ClientRanking>(reply.data);
+                MainThread.invoke(() => gameServices.notifyEndSession(ranking));
                 break;
             default:
                 throw new Exception("UNKNOWN MESSAGE: " +  reply.action);

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Assets.Scripts.engine.game;
 using Assets.Scripts.engine.services;
 using Assets.Scripts.view.card;
@@ -40,7 +41,7 @@ public class GameMultiplayerView : GameView, GameServices
         DrawCard(cards);
     }
 
-    public void notifyOpenCardsAfterMatch(List<Card> cards)
+    public new void notifyOpenCardsAfterMatch(List<Card> cards)
     {
         Debug.LogWarning("notifyOpenCardsAfterMatch :  " + cards.Count);
         DrawCard(cards);
@@ -66,21 +67,24 @@ public class GameMultiplayerView : GameView, GameServices
         }
     }
 
-    public void notifyMatchCompleted(List<Card> cards)
+    public new void notifyMatchCompleted(List<Card> cards)
     {
-        Debug.LogWarning("notifyMatchCompleted :  " +  cards.Count +  " | " + cardList.Count);
-
         if (cards != null)
         {
+            List<CardView> cardsToRemove = new List<CardView>();
             foreach (var cd in cards)
             {
+   
                 foreach (var t in cardList)
                 {
-                    if (!cd.Equals(t.card)) continue;
-                    cardList.Remove(t);
-                    Destroy(t.gameObject);
+                    if (t==null || t.card ==null || !cd.Equals(t.card)) continue;
+                    cardsToRemove.Add(t);
+                    //cardList.Remove(t);
                 }
             }
+
+            foreach (var t in cardsToRemove) cardList.Remove(t);
+            cardsToRemove.ForEach(x=>Destroy(x.gameObject));
         }
         else
         {

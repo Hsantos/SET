@@ -146,6 +146,7 @@ public class ClientNetwork:MonoBehaviour, NetworkServices
             case RequestAction.MATCH:
                 List<Card> cardsMatch = JsonConvert.DeserializeObject<List<Card>>(reply.data);
                 MainThread.invoke(() => gameServices.notifyMatchCompleted(cardsMatch));
+                if (cardsMatch != null) CardsAfterMatchRequest();
                 break;
             case RequestAction.END_SESSION:
                 ClientRanking ranking = JsonConvert.DeserializeObject<ClientRanking>(reply.data);
@@ -174,4 +175,16 @@ public class ClientNetwork:MonoBehaviour, NetworkServices
         ReceiveMessageToServer();
         receiveDone.WaitOne();
     }
+
+    public void CardsAfterMatchRequest()
+    {
+        ClientRequest request = new ClientRequest(RequestAction.CARDS_AFTER_MATCH, "");
+        SendMessageToServer(request);
+        sendDone.WaitOne();
+
+        ReceiveMessageToServer();
+        receiveDone.WaitOne();
+    }
+
+
 }
